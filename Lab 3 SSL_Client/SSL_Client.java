@@ -20,6 +20,7 @@ public class SSL_Client {
 	private OutputStreamWriter outputstreamwriter;
 	private BufferedWriter bufferedwriter;
 	private String choice;
+	private boolean running = true;
 
 	private void connect() {
 		try {
@@ -27,40 +28,45 @@ public class SSL_Client {
 			System.setProperty("javax.net.ssl.trustStore", _TRUSTSTORE);
 			System.setProperty("javax.net.ssl.trustStorePassword", _PASSWORD);
 			// Create the SSL connection.
-			sslsocketfactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
-			sslsocket = (SSLSocket) sslsocketfactory.createSocket("localhost", _PORT);
-			// Handle input.
-			inputstream = System.in;
-			inputstreamreader = new InputStreamReader(inputstream);
-			bufferedreader = new BufferedReader(inputstreamreader);
 
-			outputstream = sslsocket.getOutputStream();
-			outputstreamwriter = new OutputStreamWriter(outputstream);
-			bufferedwriter = new BufferedWriter(outputstreamwriter);
+			while (running) {
+				sslsocketfactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
+				sslsocket = (SSLSocket) sslsocketfactory.createSocket("localhost", _PORT);
+				sslsocket.setKeepAlive(true);
+				// Handle input.
+				inputstream = System.in;
+				inputstreamreader = new InputStreamReader(inputstream);
+				bufferedreader = new BufferedReader(inputstreamreader);
 
-			System.out.println("1. Download file\n2. Upload file\n3. Delete file \n");
-			System.out.print("Choice: ");
-			choice = bufferedreader.readLine();
-			// Sends the operation type to the server.
-			bufferedwriter.write(choice + '\n');
-			bufferedwriter.flush();
+				outputstream = sslsocket.getOutputStream();
+				outputstreamwriter = new OutputStreamWriter(outputstream);
+				bufferedwriter = new BufferedWriter(outputstreamwriter);
 
-			if (choice.equals("1")) {
+				System.out.println("\n1. Download file\n2. Upload file\n3. Delete file\n4. Else->Exit\n");
+				System.out.print("Choice: ");
+				choice = bufferedreader.readLine();
+				// Sends the operation type to the server.
+				bufferedwriter.write(choice + '\n');
+				bufferedwriter.flush();
 
-				this.download();
+				if (choice.equals("1")) {
 
-			} else if (choice.equals("3")) {
+					this.download();
 
-				this.delete();
-			} else if (choice.equals("2")) {
-				this.uploadFile();
+				} else if (choice.equals("3")) {
+
+					this.delete();
+				} else if (choice.equals("2")) {
+					this.uploadFile();
+				} else {
+					running = false;
+				}
 			}
 			// Close the connection once done with the operation.
 			sslsocket.close();
 
 		} catch (Exception exception) {
-			// exception.printStackTrace();
-			System.out.println("Lost connection to server.");
+			exception.printStackTrace();
 
 		}
 	}
@@ -112,6 +118,8 @@ public class SSL_Client {
 			bufferedwriter.flush();
 			System.out.println("File " + string + " deleted!");
 		} catch (Exception e) {
+			e.printStackTrace();
+
 			System.out.println("Error in delete function.");
 		}
 
@@ -132,15 +140,14 @@ public class SSL_Client {
 			FileInputStream fis = new FileInputStream(myFile);
 			BufferedInputStream bis = new BufferedInputStream(fis);
 			bis.read(mybytearray, 0, mybytearray.length);
-			OutputStream os = sslsocket.getOutputStream();
+			outputstream = sslsocket.getOutputStream();
 			System.out.println("Sending " + string + "(" + mybytearray.length + " bytes)");
-			os.write(mybytearray, 0, mybytearray.length);
-			os.flush();
+			outputstream.write(mybytearray, 0, mybytearray.length);
+			outputstream.flush();
 			System.out.println("Done.");
 
 			bis.close();
-			inputstream.close();
-			os.close();
+			outputstream.close();
 		} catch (Exception e) {
 			System.out.println("Error in upload function.");
 		}

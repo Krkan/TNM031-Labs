@@ -27,6 +27,7 @@ public class SSL_Server {
 	private InputStreamReader inputstreamreader;
 	private BufferedReader bufferedreader;
 	private String choice;
+	private boolean running = true;
 
 	private void startServer() {
 		// Set the keystore and password settings
@@ -35,34 +36,40 @@ public class SSL_Server {
 		System.setProperty("javax.net.ssl.keyStorePassword", _PASSWORD);
 		try {
 			// Create an SSL socket that listens
+
 			sslserversocketfactory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
 			sslserversocket = (SSLServerSocket) sslserversocketfactory.createServerSocket(_PORT);
 			System.out.println("Awaiting conection...");
+			while (running) {
+				sslsocket = (SSLSocket) sslserversocket.accept();
+				sslsocket.setKeepAlive(true);
 
-			sslsocket = (SSLSocket) sslserversocket.accept();
+				inputstream = sslsocket.getInputStream();
+				inputstreamreader = new InputStreamReader(inputstream);
+				bufferedreader = new BufferedReader(inputstreamreader);
 
-			// Get a choice from the client
-			inputstream = sslsocket.getInputStream();
-			inputstreamreader = new InputStreamReader(inputstream);
-			bufferedreader = new BufferedReader(inputstreamreader);
-			// Gets an operation type from the client.
-			choice = bufferedreader.readLine();
+				// Gets an operation type from the client.
 
-			if (choice.equals("1")) {
-				this.uploadFile();
-			} else if (choice.equals("3")) {
-				this.deleteFile();
+				choice = bufferedreader.readLine();
+				if (choice != null) {
+					if (choice.equals("1")) {
+						this.uploadFile();
+					} else if (choice.equals("3")) {
+						this.deleteFile();
 
-			} else if (choice.equals("2")) {
-				this.download();
+					} else if (choice.equals("2")) {
+						this.download();
 
+					} else {
+						running = false;
+					}
+				}
 			}
 			// Close the connection when done with the operation.
 			sslsocket.close();
 
 		} catch (Exception exception) {
-			// exception.printStackTrace();
-			System.out.println("Client closed connection.");
+			exception.printStackTrace();
 		}
 
 	}
@@ -85,7 +92,6 @@ public class SSL_Server {
 			System.out.println("Done.");
 
 			bis.close();
-			inputstream.close();
 			os.close();
 		} catch (Exception e) {
 			System.out.println("Error in upload function.");
