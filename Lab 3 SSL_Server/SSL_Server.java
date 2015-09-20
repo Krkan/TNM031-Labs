@@ -1,4 +1,3 @@
-
 //Izmir labb3
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
@@ -16,6 +15,7 @@ import java.io.OutputStream;
 public class SSL_Server {
 
 	private String _KEYSTORE = "keystore.jks";
+	private String _TRUSTSTORE = "cacerts.jks";
 	private String _PASSWORD = "changeit";
 	private int _PORT = 43000;
 	private int FILE_SIZE = 6022386;
@@ -30,19 +30,25 @@ public class SSL_Server {
 	private boolean running = true;
 
 	private void startServer() {
-		// Set the keystore and password settings
+		// Set the keystore & truststore password settings
 
 		System.setProperty("javax.net.ssl.keyStore", _KEYSTORE);
 		System.setProperty("javax.net.ssl.keyStorePassword", _PASSWORD);
+		
+		System.setProperty("javax.net.ssl.trustStore", _TRUSTSTORE);
+		System.setProperty("javax.net.ssl.trustStorePassword", _PASSWORD);
 		try {
 			// Create an SSL socket that listens
 
 			sslserversocketfactory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
 			sslserversocket = (SSLServerSocket) sslserversocketfactory.createServerSocket(_PORT);
+			
+			//Setting authentication 
+			sslserversocket.setNeedClientAuth(true);
+		
 			System.out.println("Awaiting conection...");
 			while (running) {
 				sslsocket = (SSLSocket) sslserversocket.accept();
-				sslsocket.setKeepAlive(true);
 
 				inputstream = sslsocket.getInputStream();
 				inputstreamreader = new InputStreamReader(inputstream);
