@@ -52,7 +52,7 @@ public class Client {
             outputstream = sslsocket.getOutputStream();
        
             os = new ObjectOutputStream(outputstream);
-            //user = new Person("Izmir", "Ibrahimovic",880722, 8633);
+            user = new Person("Izmir", "Ibrahimovic",900723, 8733);
             //user = new Person("Peter", "Karlsson",900723, 2363);
             //user = new Person("Anna", "Johansson",670323, 2313);
             //user = new Person("Adam", "Lindberg",790117, 6363);
@@ -69,7 +69,7 @@ public class Client {
             
             
             if(!cla_result.equals("VOTE_COUNTED_EARLIER") && !cla_result.equals("UNAUTHORIZED_ACCESS") ){
-            theVote = new Vote(this.generateID(cla_result),cla_result,1);
+            theVote = new Vote(this.generateID(cla_result),cla_result,3);
             
             
             sslsocket2 = (SSLSocket) sslsocketfactory.createSocket("localhost", 10001);

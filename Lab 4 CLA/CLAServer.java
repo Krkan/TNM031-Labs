@@ -33,7 +33,7 @@ public class CLAServer {
 	
 	//Populate the list of allowed voters.
 	private void initiateList(){
-		allowedVoters.add(new Person("Izmir", "Ibrahimovic",880722, 8633));
+		allowedVoters.add(new Person("Izmir", "Ibrahimovic",900723, 8733));
 		allowedVoters.add(new Person("Peter", "Karlsson",900723, 2363));
 		allowedVoters.add(new Person("Anna", "Johansson",670323, 2313));
 		allowedVoters.add(new Person("Adam", "Lindberg",790117, 6363));
