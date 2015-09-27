@@ -66,6 +66,9 @@ public class CTFServer {
 			System.out.println(recievedVotes.get(i).getID() + " voted for " + recievedVotes.get(i).getVote());
 			
 		}
+		int c = count+1;
+		
+		System.out.println("\nNumber of people voted: " + c +"\n");
 	
 	}
 	
